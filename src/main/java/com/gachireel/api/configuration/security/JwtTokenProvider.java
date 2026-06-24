@@ -1,6 +1,5 @@
 package com.gachireel.api.configuration.security;
 
-import com.gachireel.api.configuration.*;
 import com.gachireel.api.configuration.constants.ConstJwt;
 import com.gachireel.api.configuration.model.JwtMember;
 import io.jsonwebtoken.Claims;
@@ -25,7 +24,7 @@ public class JwtTokenProvider {
         this.objectMapper = objectMapper;
         this.constJwt = constJwt;
         // 시크릿 키 문자열을 암호화에 쓸 수 있는 키 객체로 변환
-        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(constJwt.getSecretKey()));
+        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(constJwt.getSecretKey()));
 
         log.info("constJwt: {}", this.constJwt);
     }
