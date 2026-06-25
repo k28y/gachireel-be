@@ -1,5 +1,8 @@
 .env
 .env_prod
+CLAUDE.md
+.claude
+data.sql
 
 HELP.md
 .gradle
