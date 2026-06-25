@@ -3,6 +3,7 @@
 CLAUDE.md
 .claude
 data.sql
+src/main/resources/static/docs/
 
 HELP.md
 .gradle

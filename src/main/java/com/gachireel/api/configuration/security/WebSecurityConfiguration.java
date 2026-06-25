@@ -28,9 +28,10 @@ public class WebSecurityConfiguration {
 
                 // 특정 요청이 올 때는 반드시 로그인이 되어있어야 한다.
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/api/auth/**").permitAll()       // 로그인, 가입신청, 토큰갱신
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // 관리자 전용
-                        .anyRequest().authenticated()                      // 그 외 전부 로그인 필요
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/swagger.html", "/swagger-ui/**", "/v3/api-docs/**", "/docs/**", "/webjars/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
