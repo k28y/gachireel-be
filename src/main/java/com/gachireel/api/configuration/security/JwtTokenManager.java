@@ -2,6 +2,8 @@ package com.gachireel.api.configuration.security;
 
 import com.gachireel.api.auth.entity.RefreshToken;
 import com.gachireel.api.auth.repository.RefreshTokenRepository;
+import com.gachireel.api.common.exception.AppException;
+import com.gachireel.api.common.exception.ErrorCode;
 import com.gachireel.api.configuration.constants.ConstJwt;
 import com.gachireel.api.configuration.model.JwtMember;
 import com.gachireel.api.configuration.model.UserPrincipal;
@@ -125,15 +127,35 @@ public class JwtTokenManager {
         deleteRefreshTokenInCookie(res);
     }
 
-    // AT 재발행
+    // 유효한 AT가 쿠키에 있는지 확인
+    public boolean hasValidAccessToken(HttpServletRequest req) {
+        String accessToken = getAccessTokenFromCookie(req);
+        if (accessToken == null) return false;
+        try {
+            jwtTokenProvider.getJwtMemberFromToken(accessToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // AT 재발행 (RT DB 검증 포함)
+    @Transactional
     public void reissue(HttpServletRequest req, HttpServletResponse res) {
-        //req에서 RT을 얻기
         String refreshToken = getRefreshTokenFromCookie(req);
+        if (refreshToken == null) {
+            throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
 
-        //RT를 이용하여 JwtUser 객체 생성
+        RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+        if (storedToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            refreshTokenRepository.delete(storedToken);
+            throw new AppException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+        }
+
         JwtMember jwtMember = jwtTokenProvider.getJwtMemberFromToken(refreshToken);
-
-        //JwtMember를 이용해 AT를 만들어 cookie에 담기
         setAccessTokenInCookie(res, jwtMember);
     }
 }
