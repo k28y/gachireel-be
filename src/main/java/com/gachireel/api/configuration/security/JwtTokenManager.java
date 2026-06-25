@@ -1,9 +1,12 @@
 package com.gachireel.api.configuration.security;
 
+import com.gachireel.api.auth.entity.RefreshToken;
+import com.gachireel.api.auth.repository.RefreshTokenRepository;
 import com.gachireel.api.configuration.constants.ConstJwt;
 import com.gachireel.api.configuration.model.JwtMember;
 import com.gachireel.api.configuration.model.UserPrincipal;
 import com.gachireel.api.configuration.util.MyCookieUtil;
+import com.gachireel.api.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,19 +14,36 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtTokenManager { //인증처리 총괄
+public class JwtTokenManager {
     private final ConstJwt constJwt;
     private final MyCookieUtil myCookieUtil;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    // 토큰을 쿠키에 담아 응답으로 내보내기
-    public void issue(HttpServletResponse res, JwtMember jwtMember){
-        setAccessTokenInCookie(res, jwtMember);
-        setRefreshTokenInCookie(res, jwtMember);
+    // 로그인 시 토큰 발급 + RT DB저장 + 쿠키 설정
+    @Transactional
+    public void issue(HttpServletResponse res, User user) {
+        JwtMember jwtMember = new JwtMember(user.getId(), user.getRole().name());
+        String accessToken = jwtTokenProvider.generateAccessToken(jwtMember);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(jwtMember);
+
+        refreshTokenRepository.deleteByUser(user);
+        refreshTokenRepository.save(RefreshToken.builder()
+                .user(user)
+                .token(refreshToken)
+                .expiresAt(LocalDateTime.now().plus(constJwt.getRefreshTokenValidityMilliseconds(), ChronoUnit.MILLIS))
+                .build());
+
+        setAccessTokenInCookie(res, accessToken);
+        setRefreshTokenInCookie(res, refreshToken);
     }
 
     // AT를 새롭게 생성후 쿠키에 담기
