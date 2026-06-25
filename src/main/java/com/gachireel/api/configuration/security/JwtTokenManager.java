@@ -113,7 +113,14 @@ public class JwtTokenManager {
     }
 
     // 로그아웃할 때 AT, RT 삭제
-    public void logOut(HttpServletResponse res){
+    @Transactional
+    public void logOut(HttpServletRequest req, HttpServletResponse res){
+        String refreshToken = getRefreshTokenFromCookie(req);
+        if (refreshToken != null) {
+            refreshTokenRepository.findByToken(refreshToken)
+                    .ifPresent(refreshTokenRepository::delete);
+        }
+        // DB 삭제 성공 여부와 관계없이 쿠키는 항상 삭제
         deleteAccessTokenInCookie(res);
         deleteRefreshTokenInCookie(res);
     }
