@@ -31,17 +31,22 @@ public class InvitationService {
 
     @Transactional
     public void createInvitation(long inviterId, InviteReq req) throws MessagingException {
+        // 이미 가입된 이메일이라면 초대 불가
         if (userRepository.findByEmail(req.email()).isPresent()) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_REGISTERED);
         }
 
+        // 동일 이메일로 기존 초대가 있으면 삭제 (재초대 허용)
         invitationRepository.deleteByEmail(req.email());
 
+        // 초대자 조회
         User inviter = userRepository.findById(inviterId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        // 고유한 초대 토큰 생성
         String token = UUID.randomUUID().toString();
 
+        // 초대 데이터 저장 (7일 후 만료)
         invitationRepository.save(Invitation.builder()
                 .inviter(inviter)
                 .email(req.email())
@@ -50,6 +55,7 @@ public class InvitationService {
                 .expiresAt(LocalDateTime.now().plusDays(7))
                 .build());
 
+        // 초대 링크 생성 후 이메일 발송
         String inviteUrl = frontendUrl + "/join?token=" + token;
         emailSender.sendInvitationMail(req.email(), inviteUrl);
     }

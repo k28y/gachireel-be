@@ -2,6 +2,7 @@ package com.gachireel.api.auth;
 
 import com.gachireel.api.auth.dto.LoginReq;
 import com.gachireel.api.auth.dto.LoginRes;
+import com.gachireel.api.auth.dto.RegisterReq;
 import com.gachireel.api.common.exception.AppException;
 import com.gachireel.api.common.exception.ErrorCode;
 import com.gachireel.api.common.response.ResultResponse;
@@ -9,6 +10,7 @@ import com.gachireel.api.configuration.security.JwtTokenManager;
 import com.gachireel.api.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +24,16 @@ public class AuthController {
     private final AuthService authService;
     private final JwtTokenManager jwtTokenManager;
 
+    // 가입 신청
+    @PostMapping("/register")
+    public ResultResponse<?> register(@RequestBody @Valid RegisterReq request) {
+        authService.register(request);
+        return ResultResponse.builder()
+                .message("가입 신청이 완료됐습니다. 관리자 승인 후 로그인 가능합니다.")
+                .build();
+    }
+
+    // 로그인
     @PostMapping("/login")
     public ResultResponse<LoginRes> login(@RequestBody LoginReq request, HttpServletRequest req, HttpServletResponse res) {
         if (jwtTokenManager.hasValidAccessToken(req)) {
