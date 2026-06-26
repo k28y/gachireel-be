@@ -1,8 +1,8 @@
-package com.gachireel.api.invitation;
+package com.gachireel.api.user.invitation;
 
 import com.gachireel.api.common.response.ResultResponse;
 import com.gachireel.api.configuration.model.UserPrincipal;
-import com.gachireel.api.invitation.dto.InviteReq;
+import com.gachireel.api.user.invitation.dto.InviteReq;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

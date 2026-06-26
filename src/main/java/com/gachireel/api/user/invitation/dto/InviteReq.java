@@ -1,4 +1,4 @@
-package com.gachireel.api.invitation.dto;
+package com.gachireel.api.user.invitation.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package com.gachireel.api.invitation.entity;
+package com.gachireel.api.user.entity;
 
 import com.gachireel.api.common.entity.CreatedAt;
 import com.gachireel.api.common.enumcode.InvitationStatus;
@@ -36,4 +36,8 @@ public class Invitation extends CreatedAt {
 
     @Column(nullable = false)
     private java.time.LocalDateTime expiresAt;
+
+    public void markAsUsed() {
+        this.status = InvitationStatus.USED;
+    }
 }

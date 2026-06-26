@@ -1,6 +1,6 @@
-package com.gachireel.api.invitation.repository;
+package com.gachireel.api.user.repository;
 
-import com.gachireel.api.invitation.entity.Invitation;
+import com.gachireel.api.user.entity.Invitation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
