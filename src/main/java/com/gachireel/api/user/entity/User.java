@@ -65,4 +65,13 @@ public class User extends CreatedUpdatedAt {
 
     @Column(length = 100)
     private String ratingCriteria5;
+
+    public void approve() {
+        this.status = UserStatus.ACTIVE;
+        this.approvedAt = java.time.LocalDateTime.now();
+    }
+
+    public void reject() {
+        this.status = UserStatus.REJECTED;
+    }
 }
