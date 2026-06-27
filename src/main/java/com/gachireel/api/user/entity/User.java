@@ -74,4 +74,8 @@ public class User extends CreatedUpdatedAt {
     public void reject() {
         this.status = UserStatus.REJECTED;
     }
+
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }

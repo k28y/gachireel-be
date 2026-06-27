@@ -1,21 +1,26 @@
 package com.gachireel.api.auth;
 
 import com.gachireel.api.auth.dto.LoginReq;
+import com.gachireel.api.auth.dto.PasswordEmailReq;
+import com.gachireel.api.auth.dto.PasswordResetReq;
 import com.gachireel.api.auth.dto.RegisterReq;
 import com.gachireel.api.common.enumcode.InvitationStatus;
 import com.gachireel.api.common.enumcode.UserRole;
 import com.gachireel.api.common.enumcode.UserStatus;
 import com.gachireel.api.common.exception.AppException;
 import com.gachireel.api.common.exception.ErrorCode;
+import com.gachireel.api.email.EmailSender;
 import com.gachireel.api.user.entity.Invitation;
 import com.gachireel.api.user.entity.User;
 import com.gachireel.api.user.repository.InvitationRepository;
 import com.gachireel.api.user.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 @Service
@@ -25,6 +30,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final InvitationRepository invitationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationStore verificationStore;
+    private final EmailSender emailSender;
 
     @Transactional(readOnly = true)
     public User login(LoginReq request) {
@@ -81,5 +88,38 @@ public class AuthService {
 
         // 초대 토큰 사용 처리
         invitation.markAsUsed();
+    }
+
+    public void sendVerificationCode(PasswordEmailReq request) throws MessagingException {
+        // 가입된 이메일인지 확인
+        userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_REGISTERED));
+
+        // 6자리 인증코드 생성
+        String code = String.format("%06d", new SecureRandom().nextInt(1000000));
+
+        // 인메모리에 저장 (5분 유효)
+        verificationStore.save(request.email(), code);
+
+        // 이메일 발송
+        emailSender.sendVerificationCodeMail(request.email(), code);
+    }
+
+    @Transactional
+    public void resetPassword(PasswordResetReq request) {
+        // 인증코드 검증
+        if (!verificationStore.verify(request.email(), request.code())) {
+            throw new AppException(ErrorCode.INVALID_VERIFICATION_CODE);
+        }
+
+        // 유저 조회
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_REGISTERED));
+
+        // 비밀번호 변경
+        user.changePassword(passwordEncoder.encode(request.newPassword()));
+
+        // 인증코드 삭제
+        verificationStore.remove(request.email());
     }
 }

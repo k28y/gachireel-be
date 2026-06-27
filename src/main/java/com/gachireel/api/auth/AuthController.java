@@ -2,7 +2,10 @@ package com.gachireel.api.auth;
 
 import com.gachireel.api.auth.dto.LoginReq;
 import com.gachireel.api.auth.dto.LoginRes;
+import com.gachireel.api.auth.dto.PasswordEmailReq;
+import com.gachireel.api.auth.dto.PasswordResetReq;
 import com.gachireel.api.auth.dto.RegisterReq;
+import jakarta.mail.MessagingException;
 import com.gachireel.api.common.exception.AppException;
 import com.gachireel.api.common.exception.ErrorCode;
 import com.gachireel.api.common.response.ResultResponse;
@@ -60,6 +63,24 @@ public class AuthController {
         jwtTokenManager.reissue(req, res);
         return ResultResponse.builder()
                 .message("Access Token 재발행")
+                .build();
+    }
+
+    // 비밀번호 재설정 - 인증코드 발송
+    @PostMapping("/password/email")
+    public ResultResponse<?> sendVerificationCode(@RequestBody @Valid PasswordEmailReq request) throws MessagingException {
+        authService.sendVerificationCode(request);
+        return ResultResponse.builder()
+                .message("인증코드를 발송했습니다.")
+                .build();
+    }
+
+    // 비밀번호 재설정 - 코드 확인 후 변경
+    @PostMapping("/password/reset")
+    public ResultResponse<?> resetPassword(@RequestBody @Valid PasswordResetReq request) {
+        authService.resetPassword(request);
+        return ResultResponse.builder()
+                .message("비밀번호가 변경됐습니다.")
                 .build();
     }
 }
