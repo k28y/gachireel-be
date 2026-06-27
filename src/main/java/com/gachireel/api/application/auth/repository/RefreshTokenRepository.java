@@ -1,7 +1,7 @@
-package com.gachireel.api.auth.repository;
+package com.gachireel.api.application.auth.repository;
 
-import com.gachireel.api.auth.entity.RefreshToken;
-import com.gachireel.api.user.entity.User;
+import com.gachireel.api.application.auth.entity.RefreshToken;
+import com.gachireel.api.application.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

@@ -1,14 +1,14 @@
 package com.gachireel.api.configuration.security;
 
-import com.gachireel.api.auth.entity.RefreshToken;
-import com.gachireel.api.auth.repository.RefreshTokenRepository;
+import com.gachireel.api.application.auth.entity.RefreshToken;
+import com.gachireel.api.application.auth.repository.RefreshTokenRepository;
 import com.gachireel.api.common.exception.AppException;
 import com.gachireel.api.common.exception.ErrorCode;
 import com.gachireel.api.configuration.constants.ConstJwt;
 import com.gachireel.api.configuration.model.JwtMember;
 import com.gachireel.api.configuration.model.UserPrincipal;
 import com.gachireel.api.configuration.util.MyCookieUtil;
-import com.gachireel.api.user.entity.User;
+import com.gachireel.api.application.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

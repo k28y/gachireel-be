@@ -1,6 +1,6 @@
 package com.gachireel.api.common.scheduler;
 
-import com.gachireel.api.user.repository.UserRepository;
+import com.gachireel.api.application.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

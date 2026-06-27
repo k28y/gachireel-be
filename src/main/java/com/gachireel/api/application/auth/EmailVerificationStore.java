@@ -1,4 +1,4 @@
-package com.gachireel.api.auth;
+package com.gachireel.api.application.auth;
 
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package com.gachireel.api.admin;
+package com.gachireel.api.application.admin;
 
 import com.gachireel.api.common.response.ResultResponse;
 import lombok.RequiredArgsConstructor;

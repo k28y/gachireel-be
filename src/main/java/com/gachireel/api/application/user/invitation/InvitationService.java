@@ -1,14 +1,14 @@
-package com.gachireel.api.user.invitation;
+package com.gachireel.api.application.user.invitation;
 
 import com.gachireel.api.common.enumcode.InvitationStatus;
 import com.gachireel.api.common.exception.AppException;
 import com.gachireel.api.common.exception.ErrorCode;
-import com.gachireel.api.email.EmailSender;
-import com.gachireel.api.user.entity.Invitation;
-import com.gachireel.api.user.entity.User;
-import com.gachireel.api.user.invitation.dto.InviteReq;
-import com.gachireel.api.user.repository.InvitationRepository;
-import com.gachireel.api.user.repository.UserRepository;
+import com.gachireel.api.application.email.EmailSender;
+import com.gachireel.api.application.user.entity.Invitation;
+import com.gachireel.api.application.user.entity.User;
+import com.gachireel.api.application.user.invitation.model.InviteReq;
+import com.gachireel.api.application.user.repository.InvitationRepository;
+import com.gachireel.api.application.user.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

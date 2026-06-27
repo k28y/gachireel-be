@@ -1,16 +1,16 @@
-package com.gachireel.api.auth;
+package com.gachireel.api.application.auth;
 
-import com.gachireel.api.auth.dto.LoginReq;
-import com.gachireel.api.auth.dto.LoginRes;
-import com.gachireel.api.auth.dto.PasswordEmailReq;
-import com.gachireel.api.auth.dto.PasswordResetReq;
-import com.gachireel.api.auth.dto.RegisterReq;
+import com.gachireel.api.application.auth.model.LoginReq;
+import com.gachireel.api.application.auth.model.LoginRes;
+import com.gachireel.api.application.auth.model.PasswordEmailReq;
+import com.gachireel.api.application.auth.model.PasswordResetReq;
+import com.gachireel.api.application.auth.model.RegisterReq;
 import jakarta.mail.MessagingException;
 import com.gachireel.api.common.exception.AppException;
 import com.gachireel.api.common.exception.ErrorCode;
 import com.gachireel.api.common.response.ResultResponse;
 import com.gachireel.api.configuration.security.JwtTokenManager;
-import com.gachireel.api.user.entity.User;
+import com.gachireel.api.application.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

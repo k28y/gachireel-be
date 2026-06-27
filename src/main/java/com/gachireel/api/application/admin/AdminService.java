@@ -1,10 +1,10 @@
-package com.gachireel.api.admin;
+package com.gachireel.api.application.admin;
 
 import com.gachireel.api.common.enumcode.UserStatus;
 import com.gachireel.api.common.exception.AppException;
 import com.gachireel.api.common.exception.ErrorCode;
-import com.gachireel.api.user.entity.User;
-import com.gachireel.api.user.repository.UserRepository;
+import com.gachireel.api.application.user.entity.User;
+import com.gachireel.api.application.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

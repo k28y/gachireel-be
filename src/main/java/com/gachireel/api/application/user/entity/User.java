@@ -1,4 +1,4 @@
-package com.gachireel.api.user.entity;
+package com.gachireel.api.application.user.entity;
 
 import com.gachireel.api.common.entity.CreatedUpdatedAt;
 import com.gachireel.api.common.enumcode.UserRole;

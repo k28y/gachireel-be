@@ -1,4 +1,4 @@
-package com.gachireel.api.email;
+package com.gachireel.api.application.email;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
