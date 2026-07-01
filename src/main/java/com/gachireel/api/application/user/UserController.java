@@ -1,7 +1,8 @@
 package com.gachireel.api.application.user;
 
 import com.gachireel.api.application.user.model.ChangePasswordReq;
-import com.gachireel.api.application.user.model.UserMyProfileRes;
+import com.gachireel.api.application.user.model.UpdateProfileReq;
+import com.gachireel.api.application.user.model.GetMyProfileRes;
 import com.gachireel.api.common.response.ResultResponse;
 import com.gachireel.api.configuration.model.UserPrincipal;
 import jakarta.validation.Valid;
@@ -22,8 +23,19 @@ public class UserController {
 
     // 내 정보 조회
     @GetMapping("/me")
-    public ResultResponse<UserMyProfileRes> getMe(@AuthenticationPrincipal UserPrincipal principal) {
+    public ResultResponse<GetMyProfileRes> getMe(@AuthenticationPrincipal UserPrincipal principal) {
         return new ResultResponse<>("내 정보 조회 성공", userService.getMe(principal.getLoginUserId()));
+    }
+
+    // 내 정보 수정
+    @PatchMapping("/me")
+    public ResultResponse<?> updateProfile(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody @Valid UpdateProfileReq request) {
+        userService.updateProfile(principal.getLoginUserId(), request);
+        return ResultResponse.builder()
+                .message("내 정보 수정 완료")
+                .build();
     }
 
     // 로그인 상태 비밀번호 변경

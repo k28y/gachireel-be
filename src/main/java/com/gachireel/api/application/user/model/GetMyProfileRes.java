@@ -3,7 +3,7 @@ package com.gachireel.api.application.user.model;
 import com.gachireel.api.application.user.entity.User;
 import com.gachireel.api.common.enumcode.UserRole;
 
-public record UserMyProfileRes(
+public record GetMyProfileRes(
         Long id,
         String email,
         String nickname,
@@ -16,8 +16,8 @@ public record UserMyProfileRes(
         String ratingCriteria4,
         String ratingCriteria5
 ) {
-    public static UserMyProfileRes from(User user) {
-        return new UserMyProfileRes(
+    public static GetMyProfileRes from(User user) {
+        return new GetMyProfileRes(
                 user.getId(),
                 user.getEmail(),
                 user.getNickname(),

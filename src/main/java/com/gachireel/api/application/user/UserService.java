@@ -1,7 +1,8 @@
 package com.gachireel.api.application.user;
 
 import com.gachireel.api.application.user.model.ChangePasswordReq;
-import com.gachireel.api.application.user.model.UserMyProfileRes;
+import com.gachireel.api.application.user.model.UpdateProfileReq;
+import com.gachireel.api.application.user.model.GetMyProfileRes;
 import com.gachireel.api.application.user.entity.User;
 import com.gachireel.api.application.user.repository.UserRepository;
 import com.gachireel.api.common.exception.AppException;
@@ -19,10 +20,32 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public UserMyProfileRes getMe(long userId) {
+    public GetMyProfileRes getMe(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        return UserMyProfileRes.from(user);
+        return GetMyProfileRes.from(user);
+    }
+
+    @Transactional
+    public void updateProfile(long userId, UpdateProfileReq request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // 닉네임 변경 시 자신을 제외한 중복 체크
+        if (request.nickname() != null &&
+                userRepository.existsByNicknameAndIdNot(request.nickname(), userId)) {
+            throw new AppException(ErrorCode.NICKNAME_ALREADY_TAKEN);
+        }
+
+        user.updateProfile(
+                request.nickname(),
+                request.bio(),
+                request.ratingCriteria1(),
+                request.ratingCriteria2(),
+                request.ratingCriteria3(),
+                request.ratingCriteria4(),
+                request.ratingCriteria5()
+        );
     }
 
     @Transactional

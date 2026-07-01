@@ -75,6 +75,19 @@ public class User extends CreatedUpdatedAt {
         this.status = UserStatus.REJECTED;
     }
 
+    public void updateProfile(String nickname, String bio,
+                              String ratingCriteria1, String ratingCriteria2, String ratingCriteria3,
+                              String ratingCriteria4, String ratingCriteria5) {
+        // null이 아닌 경우에만 업데이트. 빈 문자열("")로 보내면 해당 필드를 초기화(null 저장)
+        if (nickname != null) this.nickname = nickname;
+        if (bio != null) this.bio = bio.isBlank() ? null : bio;
+        if (ratingCriteria1 != null) this.ratingCriteria1 = ratingCriteria1.isBlank() ? null : ratingCriteria1;
+        if (ratingCriteria2 != null) this.ratingCriteria2 = ratingCriteria2.isBlank() ? null : ratingCriteria2;
+        if (ratingCriteria3 != null) this.ratingCriteria3 = ratingCriteria3.isBlank() ? null : ratingCriteria3;
+        if (ratingCriteria4 != null) this.ratingCriteria4 = ratingCriteria4.isBlank() ? null : ratingCriteria4;
+        if (ratingCriteria5 != null) this.ratingCriteria5 = ratingCriteria5.isBlank() ? null : ratingCriteria5;
+    }
+
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
