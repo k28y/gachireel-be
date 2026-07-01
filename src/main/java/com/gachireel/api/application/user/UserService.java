@@ -1,8 +1,9 @@
 package com.gachireel.api.application.user;
 
 import com.gachireel.api.application.user.model.ChangePasswordReq;
-import com.gachireel.api.application.user.model.UpdateProfileReq;
 import com.gachireel.api.application.user.model.GetMyProfileRes;
+import com.gachireel.api.application.user.model.GetUserProfileRes;
+import com.gachireel.api.application.user.model.UpdateProfileReq;
 import com.gachireel.api.application.user.entity.User;
 import com.gachireel.api.application.user.repository.UserRepository;
 import com.gachireel.api.common.exception.AppException;
@@ -20,10 +21,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public GetMyProfileRes getMe(long userId) {
+    public GetMyProfileRes getMyProfile(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return GetMyProfileRes.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public GetUserProfileRes getUserProfile(long targetId) {
+        User user = userRepository.findById(targetId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return GetUserProfileRes.from(user);
     }
 
     @Transactional
