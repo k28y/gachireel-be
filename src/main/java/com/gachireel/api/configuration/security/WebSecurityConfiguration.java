@@ -1,9 +1,9 @@
 package com.gachireel.api.configuration.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,7 +21,7 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         return httpSecurity.sessionManagement(session
-                        -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //시큐리티에서 session 사용 안하겠다
+                        -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 시큐리티에서 session 사용 안하겠다
                 .httpBasic( hb -> hb.disable() )
                 .formLogin( fl -> fl.disable() )
                 .csrf(csrf -> csrf.disable())
@@ -32,6 +32,11 @@ public class WebSecurityConfiguration {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/swagger.html", "/swagger-ui/**", "/v3/api-docs/**", "/docs/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                // 미인증 → 401, 권한 없음 → 403
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+                        .accessDeniedHandler((req, res, e) -> res.sendError(HttpServletResponse.SC_FORBIDDEN))
                 )
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
