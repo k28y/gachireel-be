@@ -76,7 +76,7 @@ public class AuthService {
             throw new AppException(ErrorCode.NICKNAME_ALREADY_TAKEN);
         }
 
-        // 유저 생성 (관리자 승인 전까지 PENDING 상태)
+        // 신규 유저 생성 (관리자 승인 전까지 PENDING 상태)
         userRepository.save(User.builder()
                 .email(invitation.getEmail())
                 .password(passwordEncoder.encode(request.password()))

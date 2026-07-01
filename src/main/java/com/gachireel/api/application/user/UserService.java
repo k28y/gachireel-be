@@ -6,6 +6,7 @@ import com.gachireel.api.application.user.model.GetUserProfileRes;
 import com.gachireel.api.application.user.model.UpdateProfileReq;
 import com.gachireel.api.application.user.entity.User;
 import com.gachireel.api.application.user.repository.UserRepository;
+import com.gachireel.api.common.enumcode.UserRole;
 import com.gachireel.api.common.exception.AppException;
 import com.gachireel.api.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // 내 정보 조회
     @Transactional(readOnly = true)
     public GetMyProfileRes getMyProfile(long userId) {
         User user = userRepository.findById(userId)
@@ -27,6 +29,18 @@ public class UserService {
         return GetMyProfileRes.from(user);
     }
 
+    // 탈퇴
+    @Transactional
+    public void deleteAccount(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (user.getRole() == UserRole.ADMIN) { // 관리자 권한은 탈퇴 불가
+            throw new AppException(ErrorCode.ADMIN_CANNOT_DELETED);
+        }
+        user.delete();
+    }
+
+    // 타 계정 정보 조회
     @Transactional(readOnly = true)
     public GetUserProfileRes getUserProfile(long targetId) {
         User user = userRepository.findById(targetId)
@@ -34,6 +48,7 @@ public class UserService {
         return GetUserProfileRes.from(user);
     }
 
+    // 내 정보 수정
     @Transactional
     public void updateProfile(long userId, UpdateProfileReq request) {
         User user = userRepository.findById(userId)
@@ -56,6 +71,7 @@ public class UserService {
         );
     }
 
+    // 내 비밀번호 변경
     @Transactional
     public void changePassword(long userId, ChangePasswordReq request) {
         // 유저 조회

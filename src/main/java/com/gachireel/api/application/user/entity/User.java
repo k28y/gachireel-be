@@ -47,6 +47,9 @@ public class User extends CreatedUpdatedAt {
     @Column
     private java.time.LocalDateTime approvedAt;
 
+    @Column
+    private java.time.LocalDateTime deletedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "referred_by")
     private User referredBy;
@@ -86,6 +89,21 @@ public class User extends CreatedUpdatedAt {
         if (ratingCriteria3 != null) this.ratingCriteria3 = ratingCriteria3.isBlank() ? null : ratingCriteria3;
         if (ratingCriteria4 != null) this.ratingCriteria4 = ratingCriteria4.isBlank() ? null : ratingCriteria4;
         if (ratingCriteria5 != null) this.ratingCriteria5 = ratingCriteria5.isBlank() ? null : ratingCriteria5;
+    }
+
+    // 탈퇴시 이메일 익명화, 개인정보 초기화
+    public void delete() {
+        this.status = UserStatus.DELETED;
+        this.deletedAt = java.time.LocalDateTime.now();
+        this.email = "deleted_" + this.id + "@deleted";
+        this.nickname = "탈퇴한 사용자";
+        this.bio = null;
+        this.pic = null;
+        this.ratingCriteria1 = null;
+        this.ratingCriteria2 = null;
+        this.ratingCriteria3 = null;
+        this.ratingCriteria4 = null;
+        this.ratingCriteria5 = null;
     }
 
     public void changePassword(String encodedPassword) {
