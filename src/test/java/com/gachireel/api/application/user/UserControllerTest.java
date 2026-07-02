@@ -25,6 +25,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
@@ -242,7 +243,8 @@ class UserControllerTest {
                 "file", "profile.jpg", "image/jpeg", new byte[]{1, 2, 3}
         );
 
-        mockMvc.perform(multipart(HttpMethod.PATCH, "/api/users/me/profile-image")
+        mockMvc.perform(MockMvcRequestBuilders
+                        .multipart(HttpMethod.PATCH, "/api/users/me/profile-image")
                         .file(mockFile))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("프로필 이미지가 변경됐습니다."))
