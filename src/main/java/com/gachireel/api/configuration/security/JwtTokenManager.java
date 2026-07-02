@@ -1,9 +1,14 @@
 package com.gachireel.api.configuration.security;
 
+import com.gachireel.api.application.auth.entity.RefreshToken;
+import com.gachireel.api.application.auth.repository.RefreshTokenRepository;
+import com.gachireel.api.common.exception.AppException;
+import com.gachireel.api.common.exception.ErrorCode;
 import com.gachireel.api.configuration.constants.ConstJwt;
 import com.gachireel.api.configuration.model.JwtMember;
 import com.gachireel.api.configuration.model.UserPrincipal;
 import com.gachireel.api.configuration.util.MyCookieUtil;
+import com.gachireel.api.application.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,19 +16,36 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtTokenManager { //인증처리 총괄
+public class JwtTokenManager {
     private final ConstJwt constJwt;
     private final MyCookieUtil myCookieUtil;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    // 토큰을 쿠키에 담아 응답으로 내보내기
-    public void issue(HttpServletResponse res, JwtMember jwtMember){
-        setAccessTokenInCookie(res, jwtMember);
-        setRefreshTokenInCookie(res, jwtMember);
+    // 로그인 시 토큰 발급 + RT DB저장 + 쿠키 설정
+    @Transactional
+    public void issue(HttpServletResponse res, User user) {
+        JwtMember jwtMember = new JwtMember(user.getId(), user.getRole().name());
+        String accessToken = jwtTokenProvider.generateAccessToken(jwtMember);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(jwtMember);
+
+        refreshTokenRepository.deleteByUser(user);
+        refreshTokenRepository.save(RefreshToken.builder()
+                .user(user)
+                .token(refreshToken)
+                .expiresAt(LocalDateTime.now().plus(constJwt.getRefreshTokenValidityMilliseconds(), ChronoUnit.MILLIS))
+                .build());
+
+        setAccessTokenInCookie(res, accessToken);
+        setRefreshTokenInCookie(res, refreshToken);
     }
 
     // AT를 새롭게 생성후 쿠키에 담기
@@ -93,20 +115,47 @@ public class JwtTokenManager { //인증처리 총괄
     }
 
     // 로그아웃할 때 AT, RT 삭제
-    public void logOut(HttpServletResponse res){
+    @Transactional
+    public void logOut(HttpServletRequest req, HttpServletResponse res){
+        String refreshToken = getRefreshTokenFromCookie(req);
+        if (refreshToken != null) {
+            refreshTokenRepository.findByToken(refreshToken)
+                    .ifPresent(refreshTokenRepository::delete);
+        }
+        // DB 삭제 성공 여부와 관계없이 쿠키는 항상 삭제
         deleteAccessTokenInCookie(res);
         deleteRefreshTokenInCookie(res);
     }
 
-    // AT 재발행
+    // 유효한 AT가 쿠키에 있는지 확인
+    public boolean hasValidAccessToken(HttpServletRequest req) {
+        String accessToken = getAccessTokenFromCookie(req);
+        if (accessToken == null) return false;
+        try {
+            jwtTokenProvider.getJwtMemberFromToken(accessToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // AT 재발행 (RT DB 검증 포함)
+    @Transactional
     public void reissue(HttpServletRequest req, HttpServletResponse res) {
-        //req에서 RT을 얻기
         String refreshToken = getRefreshTokenFromCookie(req);
+        if (refreshToken == null) {
+            throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
 
-        //RT를 이용하여 JwtUser 객체 생성
+        RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+        if (storedToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            refreshTokenRepository.delete(storedToken);
+            throw new AppException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+        }
+
         JwtMember jwtMember = jwtTokenProvider.getJwtMemberFromToken(refreshToken);
-
-        //JwtMember를 이용해 AT를 만들어 cookie에 담기
         setAccessTokenInCookie(res, jwtMember);
     }
 }

@@ -1,0 +1,15 @@
+constants:
+  jwt:
+    issuer: gachireel
+    bearer-format: JWT
+    claim-key: user
+    # 테스트 전용 더미 키 — 프로덕션 키와 무관
+    secret-key: dGVzdFNlY3JldEtleUZvcklUZXN0aW5nT25seVZhbGlkMTIzNDU2Nzg5MA==
+    access-token-cookie-name: GAT
+    access-token-cookie-path: /
+    access-token-cookie-validity-seconds: 1800
+    access-token-validity-milliseconds: 1800000
+    refresh-token-cookie-name: GRT
+    refresh-token-cookie-path: /api/auth
+    refresh-token-cookie-validity-seconds: 1209600
+    refresh-token-validity-milliseconds: 1209600000

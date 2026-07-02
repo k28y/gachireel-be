@@ -21,8 +21,41 @@ spring:
     open-in-view: false
     defer-datasource-initialization: true
 
+  mail:
+    # Gmail SMTP 서버 주소
+    host: smtp.gmail.com
+    # STARTTLS 방식의 표준 포트
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          # SMTP 인증 사용 (필수)
+          auth: true
+          starttls:
+            # 보안 연결(TLS) 사용 (필수)
+            enable: true
+            required: true
+          timeout: 5000
+
 server:
   port: 8080
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  supabase-url: ${SUPABASE_URL}
+  supabase-service-key: ${SUPABASE_SERVICE_KEY}
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+    url: /docs/openapi3.yaml
 
 constants:
   jwt:
@@ -30,11 +63,11 @@ constants:
     bearer-format: JWT
     claim-key: user
     secret-key: ${JWT_SECRET}
-    access-token-cookie-name: gat
+    access-token-cookie-name: GAT
     access-token-cookie-path: /
     access-token-cookie-validity-seconds: 1800        # 30분
     access-token-validity-milliseconds: 1800000       # 30분
-    refresh-token-cookie-name: grt
+    refresh-token-cookie-name: GRT
     refresh-token-cookie-path: /api/auth
     refresh-token-cookie-validity-seconds: 1209600    # 14일
     refresh-token-validity-milliseconds: 1209600000   # 14일

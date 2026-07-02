@@ -1,7 +1,7 @@
-package com.gachireel.api.auth.entity;
+package com.gachireel.api.application.auth.entity;
 
 import com.gachireel.api.common.entity.CreatedAt;
-import com.gachireel.api.user.entity.User;
+import com.gachireel.api.application.user.entity.User;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.*;
