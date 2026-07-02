@@ -56,6 +56,89 @@ public class EmailSender {
                 """.formatted(code);
     }
 
+    public void sendApprovalMail(String to, String frontendUrl) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setTo(to);
+        helper.setSubject("[가치릴] 가입이 승인됐습니다");
+        helper.setText(getApprovalTemplate(frontendUrl), true);
+        mailSender.send(message);
+    }
+
+    private String getApprovalTemplate(String frontendUrl) {
+        return """
+                <!DOCTYPE html>
+                <html lang="ko">
+                <head><meta charset="UTF-8"></head>
+                <body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+                  <table width="100%%" cellpadding="0" cellspacing="0">
+                    <tr><td align="center" style="padding:40px 0;">
+                      <table width="500" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;padding:40px;">
+                        <tr><td align="center" style="padding-bottom:24px;">
+                          <h1 style="color:#1a1a1a;font-size:24px;margin:0;">가치릴</h1>
+                          <p style="color:#666;font-size:14px;margin:8px 0 0;">영화·드라마 리뷰 커뮤니티</p>
+                        </td></tr>
+                        <tr><td style="padding:24px 0;border-top:1px solid #eee;border-bottom:1px solid #eee;">
+                          <p style="color:#333;font-size:16px;line-height:1.6;margin:0;">
+                            가입이 승인됐습니다.<br><br>
+                            이제 가치릴에서 영화·드라마 리뷰를<br>
+                            함께 나눠보세요.
+                          </p>
+                        </td></tr>
+                        <tr><td align="center" style="padding:32px 0;">
+                          <a href="%s" style="background:#1a1a1a;color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-size:16px;font-weight:bold;">로그인하기</a>
+                        </td></tr>
+                        <tr><td style="color:#999;font-size:12px;text-align:center;">
+                          본인이 가입 신청한 적이 없다면 이 메일을 무시하세요.
+                        </td></tr>
+                      </table>
+                    </td></tr>
+                  </table>
+                </body>
+                </html>
+                """.formatted(frontendUrl);
+    }
+
+    public void sendRejectionMail(String to) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setTo(to);
+        helper.setSubject("[가치릴] 가입 신청 결과 안내");
+        helper.setText(getRejectionTemplate(), true);
+        mailSender.send(message);
+    }
+
+    private String getRejectionTemplate() {
+        return """
+                <!DOCTYPE html>
+                <html lang="ko">
+                <head><meta charset="UTF-8"></head>
+                <body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+                  <table width="100%%" cellpadding="0" cellspacing="0">
+                    <tr><td align="center" style="padding:40px 0;">
+                      <table width="500" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;padding:40px;">
+                        <tr><td align="center" style="padding-bottom:24px;">
+                          <h1 style="color:#1a1a1a;font-size:24px;margin:0;">가치릴</h1>
+                          <p style="color:#666;font-size:14px;margin:8px 0 0;">영화·드라마 리뷰 커뮤니티</p>
+                        </td></tr>
+                        <tr><td style="padding:24px 0;border-top:1px solid #eee;border-bottom:1px solid #eee;">
+                          <p style="color:#333;font-size:16px;line-height:1.6;margin:0;">
+                            가입 신청을 검토한 결과,<br>
+                            이번에는 승인이 어렵게 됐습니다.<br><br>
+                            문의 사항은 초대해 주신 분께 연락해 주세요.
+                          </p>
+                        </td></tr>
+                        <tr><td style="color:#999;font-size:12px;text-align:center;padding-top:24px;">
+                          본인이 가입 신청한 적이 없다면 이 메일을 무시하세요.
+                        </td></tr>
+                      </table>
+                    </td></tr>
+                  </table>
+                </body>
+                </html>
+                """;
+    }
+
     public void sendInvitationMail(String to, String inviteUrl) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

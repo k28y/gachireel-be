@@ -78,6 +78,10 @@ public class User extends CreatedUpdatedAt {
         this.status = UserStatus.REJECTED;
     }
 
+    public void revertRejection() {
+        this.status = UserStatus.PENDING;
+    }
+
     public void updateProfile(String nickname, String bio,
                               String ratingCriteria1, String ratingCriteria2, String ratingCriteria3,
                               String ratingCriteria4, String ratingCriteria5) {

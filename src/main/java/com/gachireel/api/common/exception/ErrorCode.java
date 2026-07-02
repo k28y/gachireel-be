@@ -22,6 +22,7 @@ public enum ErrorCode {
     EMAIL_NOT_REGISTERED(HttpStatus.NOT_FOUND, "가입되지 않은 이메일입니다."),
     NICKNAME_ALREADY_TAKEN(HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),
     USER_NOT_PENDING(HttpStatus.CONFLICT, "승인 대기 중인 유저가 아닙니다."),
+    USER_NOT_REJECTED(HttpStatus.CONFLICT, "거절된 유저가 아닙니다."),
     ADMIN_CANNOT_DELETED(HttpStatus.FORBIDDEN, "관리자 계정은 탈퇴할 수 없습니다."),
     WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "현재 비밀번호가 일치하지 않습니다."),
     SAME_AS_CURRENT_PASSWORD(HttpStatus.CONFLICT, "현재 비밀번호와 동일합니다."),
