@@ -13,7 +13,9 @@ public record GetAdminUserRes(
         UserStatus status,
         UserRole role,
         LocalDateTime createdAt,
-        LocalDateTime approvedAt
+        LocalDateTime approvedAt,
+        LocalDateTime deletedAt,
+        String referredByNickname
 ) {
     public static GetAdminUserRes from(User user) {
         return new GetAdminUserRes(
@@ -23,7 +25,9 @@ public record GetAdminUserRes(
                 user.getStatus(),
                 user.getRole(),
                 user.getCreatedAt(),
-                user.getApprovedAt()
+                user.getApprovedAt(),
+                user.getDeletedAt(),
+                user.getReferredBy() != null ? user.getReferredBy().getNickname() : null
         );
     }
 }
