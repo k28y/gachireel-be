@@ -1,5 +1,6 @@
 package com.gachireel.api.application.admin;
 
+import com.gachireel.api.application.admin.model.GetAdminUserRes;
 import com.gachireel.api.application.email.EmailSender;
 import com.gachireel.api.common.enumcode.UserStatus;
 import com.gachireel.api.common.exception.AppException;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AdminService {
@@ -21,6 +24,15 @@ public class AdminService {
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
+
+    @Transactional(readOnly = true)
+    public List<GetAdminUserRes> getUserList(UserStatus status) {
+        // status가 없으면 전체 조회, 있으면 해당 상태만 필터링
+        List<User> users = (status != null)
+                ? userRepository.findAllByStatusOrderByCreatedAtDesc(status)
+                : userRepository.findAllByOrderByCreatedAtDesc();
+        return users.stream().map(GetAdminUserRes::from).toList();
+    }
 
     @Transactional
     public void approveUser(Long userId) throws MessagingException {
