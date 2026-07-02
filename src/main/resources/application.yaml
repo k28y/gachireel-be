@@ -42,8 +42,15 @@ spring:
 server:
   port: 8080
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  supabase-url: ${SUPABASE_URL}
+  supabase-service-key: ${SUPABASE_SERVICE_KEY}
 
 springdoc:
   swagger-ui:

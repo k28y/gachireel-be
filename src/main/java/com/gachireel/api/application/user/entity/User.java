@@ -110,6 +110,10 @@ public class User extends CreatedUpdatedAt {
         this.ratingCriteria5 = null;
     }
 
+    public void updateProfileImage(String pic) {
+        this.pic = pic;
+    }
+
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
     }

@@ -12,13 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/users")
@@ -60,6 +55,27 @@ public class UserController {
         userService.updateProfile(principal.getLoginUserId(), request);
         return ResultResponse.builder()
                 .message("내 정보 수정 완료")
+                .build();
+    }
+
+    // 프로필 이미지 변경
+    @PatchMapping("/me/profile-image")
+    public ResultResponse<?> updateProfileImage(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam("file") MultipartFile file) {
+        userService.updateProfileImage(principal.getLoginUserId(), file);
+        return ResultResponse.builder()
+                .message("프로필 이미지가 변경됐습니다.")
+                .build();
+    }
+
+    // 프로필 이미지 삭제
+    @DeleteMapping("/me/profile-image")
+    public ResultResponse<?> deleteProfileImage(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        userService.deleteProfileImage(principal.getLoginUserId());
+        return ResultResponse.builder()
+                .message("프로필 이미지가 삭제됐습니다.")
                 .build();
     }
 

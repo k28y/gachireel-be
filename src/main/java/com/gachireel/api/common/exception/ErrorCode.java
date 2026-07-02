@@ -31,7 +31,11 @@ public enum ErrorCode {
     EMAIL_ALREADY_REGISTERED(HttpStatus.CONFLICT, "이미 가입된 이메일입니다."),
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 발송에 실패했습니다."),
     INVALID_INVITATION(HttpStatus.BAD_REQUEST, "유효하지 않은 초대 링크입니다."),
-    EXPIRED_INVITATION(HttpStatus.BAD_REQUEST, "만료된 초대 링크입니다.")
+    EXPIRED_INVITATION(HttpStatus.BAD_REQUEST, "만료된 초대 링크입니다."),
+
+    // Storage
+    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "이미지 파일만 업로드할 수 있습니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.")
     ;
 
     private final HttpStatus status;

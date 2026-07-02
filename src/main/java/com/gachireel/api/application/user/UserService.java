@@ -1,5 +1,6 @@
 package com.gachireel.api.application.user;
 
+import com.gachireel.api.application.storage.FileStorageClient;
 import com.gachireel.api.application.user.model.ChangePasswordReq;
 import com.gachireel.api.application.user.model.GetMyProfileRes;
 import com.gachireel.api.application.user.model.GetUserProfileRes;
@@ -13,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileStorageClient storageClient;
 
     // 내 정보 조회
     @Transactional(readOnly = true)
@@ -69,6 +74,39 @@ public class UserService {
                 request.ratingCriteria4(),
                 request.ratingCriteria5()
         );
+    }
+
+    // 프로필 이미지 변경
+    @Transactional
+    public void updateProfileImage(long userId, MultipartFile file) {
+        // 이미지 파일인지 확인
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new AppException(ErrorCode.INVALID_FILE_TYPE);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        try {
+            String publicUrl = storageClient.upload(userId, file.getBytes(), contentType);
+            user.updateProfileImage(publicUrl);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.FILE_UPLOAD_FAILED);
+        }
+    }
+
+    // 프로필 이미지 삭제
+    @Transactional
+    public void deleteProfileImage(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getPic() == null) return; // 이미 없으면 무시
+
+        storageClient.delete(userId);
+        user.updateProfileImage(null);
+        userRepository.save(user);
     }
 
     // 내 비밀번호 변경
